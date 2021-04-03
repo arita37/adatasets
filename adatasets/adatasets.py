@@ -155,6 +155,71 @@ def git_current_hash(mode='full'):
 
 
 
+def fetch_dataset(url_dataset, path_target=None, file_target=None):
+    """Fetch dataset from a given URL and save it.
+
+    Currently `github`, `gdrive` and `dropbox` are the only supported sources of
+    data. Also only zip files are supported.
+
+    :param url_dataset:   URL to send
+    :param path_target:   Path to save dataset
+    :param file_target:   File to save dataset
+
+    """
+    log("###### Download ##################################################")
+    from tempfile import mktemp, mkdtemp
+    from urllib.parse import urlparse, parse_qs
+    import pathlib
+    fallback_name        = "features"
+    download_path        = path_target
+    supported_extensions = [ ".zip" ]
+
+    if path_target is None:
+        path_target   = mkdtemp(dir=os.path.curdir)
+        download_path = path_target
+    else:
+        pathlib.Path(path_target).mkdir(parents=True, exist_ok=True)
+
+    if file_target is None:
+        file_target = fallback_name # mktemp(dir="")
+
+
+    if "github.com" in url_dataset:
+        """
+                # https://github.com/arita37/dsa2_data/raw/main/input/titanic/train/features.zip
+              https://github.com/arita37/dsa2_data/raw/main/input/titanic/train/features.zip            
+              https://raw.githubusercontent.com/arita37/dsa2_data/main/input/titanic/train/features.csv            
+              https://raw.githubusercontent.com/arita37/dsa2_data/tree/main/input/titanic/train/features.zip             
+              https://github.com/arita37/dsa2_data/blob/main/input/titanic/train/features.zip
+                 
+        """
+        # urlx = url_dataset.replace(  "github.com", "raw.githubusercontent.com" )
+        urlx = url_dataset.replace("/blob/", "/raw/")
+        urlx = urlx.replace("/tree/", "/raw/")
+        log(urlx)
+
+        urlpath = urlx.replace("https://github.com/", "github_")
+        urlpath = urlpath.split("/")
+        fname = urlpath[-1]  ## filaneme
+        fpath = "-".join(urlpath[:-1])[:-1]   ### prefix path normalized
+        assert "." in fname, f"No filename in the url {urlx}"
+
+        os.makedirs(download_path + "/" + fpath, exist_ok= True)
+        full_filename = os.path.abspath( download_path + "/" + fpath + "/" + fname )
+        log('#### Download saving in ', full_filename)
+
+        import requests
+        with requests.Session() as s:
+            res = s.get(urlx)
+            if res.ok:
+                print(res.ok)
+                with open(full_filename, "wb") as f:
+                    f.write(res.content)
+            else:
+                raise res.raise_for_status()
+        return full_filename
+
+
 
 
 
