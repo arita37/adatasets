@@ -7,9 +7,10 @@
       from adatasets import data_classifier_covtype  
       df, pars = data_classifier_covtype(nrows=500)
     
-      coly   = pars['colfamily']['coly']
-      colnum = pars['colfamily']['colnum']
-      colcat = pars['colfamily']['colcat']
+      coly   = pars['coly']
+      colnum = pars['colnum']
+      colcat = pars['colcat']      
+      metrics = pars['metrics']
       ``` 
 
 
