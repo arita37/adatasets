@@ -13,7 +13,8 @@ root = os.path.abspath(os.path.dirname(__file__))
 
 
 ##### Version  #######################################################################
-version ='0.0.3'
+reponame = "adatasets"
+version ='0.0.1'
 cmdclass= None
 print("version", version)
 
@@ -22,7 +23,7 @@ print("version", version)
 ##### Requirements ###################################################################
 #with open('install/requirements.txt') as fp:
 #    install_requires = fp.read()
-install_requires = ['pyyaml']
+install_requires = ['pyyaml', 'pmlb']
 
 
 
@@ -45,7 +46,7 @@ long_description =  f"""
 ```
 Utils
 
-git hash : https://github.com/arita37/myutil/tree/{githash}
+git hash : https://github.com/arita37/{reponame}/tree/{githash}
 
 
 ```
@@ -54,7 +55,7 @@ git hash : https://github.com/arita37/myutil/tree/{githash}
 
 
 ### Packages  ########################################################
-packages = ["utilmy"] + ["utilmy." + p for p in find_packages("utilmy")]
+packages = [reponame] + [ reponame+ "." + p for p in find_packages(reponame)]
 print(packages)
 
 
@@ -74,8 +75,8 @@ entry_points={ 'console_scripts': [
 
 ##################################################################   
 setup(
-    name="utilmy",
-    description="utils",
+    name=reponame,
+    description="utils datasets",
     keywords='utils',
     
     author="Nono",    

@@ -1,50 +1,127 @@
 # pylint: disable=C0321,C0103,C0301,E1305,E1121,C0302,C0330,C0111,W0613,W0611,R1705
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime,inspect, json, yaml
+import logging, os, pandas as pd, numpy as np
+from sklearn.model_selection import train_test_split
+from pathlib import Path
+
+####################################################################################################
+verbosity = 3
+
+def log(*s):
+    print(*s, flush=True)
 
 
+####################################################################################################
 
-################################################################################################
-def global_verbosity(cur_path, path_relative="/../../config.json",
-                   default=5, key='verbosity',):
-    """ Get global verbosity
-    verbosity = global_verbosity(__file__, "/../../config.json", default=5 )
 
-    verbosity = global_verbosity("repo_root", "config/config.json", default=5 )
+def benchmark(config='', dmin=5, dmax=6):
+    from pmlb import fetch_data, classification_dataset_names
 
-    :param cur_path:
-    :param path_relative:
-    :param key:
-    :param default:
-    :return:
-    """
-    try   :
-      if 'repo_root' == cur_path  :
-          cur_path =  git_repo_root()
+    for classification_dataset in classification_dataset_names[dmin:dmax]:
+        X, y = fetch_data(classification_dataset, return_X_y=True)
 
-      if '.json' in path_relative :
-         dd = json.load(open(os.path.dirname(os.path.abspath(cur_path)) + path_relative , mode='r'))
-
-      elif '.yaml' in path_relative or '.yml' in path_relative :
-         import yaml
-         dd = yaml.load(open(os.path.dirname(os.path.abspath(cur_path)) + path_relative , mode='r'))
-
-      else :
-          raise Exception( path_relative + " not supported ")
-      verbosity = int(dd[key])
-
-    except Exception as e :
-      verbosity = default
-      #raise Exception(f"{e}")
-    return verbosity
+        X_train_full, X_test, y_train_full, y_test = train_test_split(X, y, test_size=0.05, random_state=2021)
+        X_train, X_valid, y_train, y_valid         = train_test_split(X_train_full, y_train_full, random_state=2021)
 
 
 
 
+def test_dataset_classifier_covtype(nrows=500):
+    import wget
+    # Dense features
+    colnum = ["Elevation", "Aspect", "Slope", "Horizontal_Distance_To_Hydrology",]
+
+    # Sparse features
+    colcat = ["Wilderness_Area1",  "Wilderness_Area2", "Wilderness_Area3",
+        "Wilderness_Area4",  "Soil_Type1",  "Soil_Type2",  "Soil_Type3",
+        "Soil_Type4",  "Soil_Type5",  "Soil_Type6",  "Soil_Type7",  "Soil_Type8",  "Soil_Type9",  ]
+
+    # Target column
+    coly        = ["Covertype"]
+
+    log("start")
+    global model, session
+
+    root     = os.path.join(os.getcwd() ,"ztmp")
+    BASE_DIR = Path.home().joinpath( root, 'data/input/covtype/')
+    datafile = BASE_DIR.joinpath('covtype.data.gz')
+    datafile.parent.mkdir(parents=True, exist_ok=True)
+    url = "https://archive.ics.uci.edu/ml/machine-learning-databases/covtype/covtype.data.gz"
+
+    # Download the dataset in case it's missing
+    if not datafile.exists():
+        wget.download(url, datafile.as_posix())
+
+    # Read nrows of only the given columns
+    feature_columns = colnum + colcat + coly
+    df = pd.read_csv(datafile, header=None, names=feature_columns, nrows=nrows)
+    #### Matching Big dict  ##################################################
+    # X = df
+    # y = df[coly].astype('uint8')
+    return df, colnum, colcat, coly
+
+
+
+def test_dataset_regress_fake(nrows=500):
+    from sklearn import datasets as sklearn_datasets
+    coly   = 'y'
+    colnum = ["colnum_" +str(i) for i in range(0, 17) ]
+    colcat = ['colcat_1']
+    X, y    = sklearn_datasets.make_regression( n_samples=1000, n_features=17, n_targets=1, n_informative=17)
+    df         = pd.DataFrame(X,  columns= colnum)
+    df[coly]   = y.reshape(-1, 1)
+
+    for ci in colcat :
+      df[colcat] = np.random.randint(0,1, len(df))
+
+    return df, colnum, colcat, coly
 
 
 
 
+def test_dataset_classi_fake(nrows=500):
+    from sklearn import datasets as sklearn_datasets
+    ndim    =11
+    coly    = 'y'
+    colnum  = ["colnum_" +str(i) for i in range(0, ndim) ]
+    colcat  = ['colcat_1']
+    X, y    = sklearn_datasets.make_classification(n_samples=1000, n_features=ndim, n_targets=1, n_informative=ndim
+    )
+    df         = pd.DataFrame(X,  columns= colnum)
+    df[coly]   = y.reshape(-1, 1)
+
+    for ci in colcat :
+      df[colcat] = np.random.randint(0,1, len(df))
+
+    return df, colnum, colcat, coly
+
+
+def test_dataset_petfinder(nrows=1000):
+    import tensorflow as tf
+    # Dense features
+    colnum = ['PhotoAmt', 'Fee','Age' ]
+
+    # Sparse features
+    colcat = ['Type', 'Color1', 'Color2', 'Gender', 'MaturitySize','FurLength', 'Vaccinated', 'Sterilized',
+              'Health', 'Breed1' ]
+
+    colembed = ['Breed1']
+    # Target column
+    coly        = "y"
+
+    dataset_url = 'http://storage.googleapis.com/download.tensorflow.org/data/petfinder-mini.zip'
+    csv_file    = 'datasets/petfinder-mini/petfinder-mini.csv'
+    tf.keras.utils.get_file('petfinder_mini.zip', dataset_url,extract=True, cache_dir='.')
+
+    print('Data Frame Loaded')
+    df      = pd.read_csv(csv_file)
+    df      = df.iloc[:nrows, :]
+    df['y'] = np.where(df['AdoptionSpeed']==4, 0, 1)
+    df      = df.drop(columns=['AdoptionSpeed', 'Description'])
+
+    print(df.dtypes)
+    return df, colnum, colcat, coly, colembed
 
 
 
@@ -114,94 +191,6 @@ def os_makedirs(dir_or_file):
 
 
 
-
-
-
-
-
-
-
-
-################################################################################################
-class Session(object) :
-    """ Save Python session on disk
-      from util import Session
-      sess = Session("recsys")
-      sess.save( globals() )
-    """
-    def __init__(self, dir_session="ztmp/session/",) :
-      os.makedirs(dir_session, exist_ok=True)
-      self.dir_session =  dir_session
-      self.cur_session =  None
-      print(self.dir_session)
-
-    def show(self) :
-       import glob
-       flist = glob.glob(self.dir_session + "/*" )
-       print(flist)
-
-    def save(self, name, glob=None, tag="") :
-       path = f"{self.dir_session}/{name}{tag}/"
-       self.cur_session = path
-       os.makedirs(self.cur_session, exist_ok=True)
-       save_session(self.cur_session, glob)
-
-    def load(self, name, glob:dict=None, tag="") :
-      path = f"{self.dir_session}/{name}{tag}/"
-      self.cur_session = path
-      print(self.cur_session)
-      load_session(self.cur_session , glob )
-
-
-def save_session(folder , globs, tag="" ) : 
-  import pandas as pd
-  os.makedirs( folder , exist_ok= True)   
-  lcheck = [ "<class 'pandas.core.frame.DataFrame'>", "<class 'list'>", "<class 'dict'>",
-             "<class 'str'>" ,  "<class 'numpy.ndarray'>" ]  
-  lexclude = {   "In", "Out" }
-  gitems = globs.items()
-  for x, _ in gitems :
-     if not x.startswith('_') and  x not in lexclude  :
-        x_type =  str(type(globs.get(x) ))
-        fname  =  folder  + "/" + x + ".pkl"
-        try :       
-          if "pandas.core.frame.DataFrame" in x_type :
-              pd.to_pickle( globs[x], fname)
-        
-          elif x_type in lcheck or x.startswith('clf')  :
-              save( globs[x], fname ) 
-              
-          print(fname)    
-        except Exception as e:
-              print(x, x_type, e)
-
-
-def load_session(folder, globs=None) :
-  """
-  """
-  print(folder)
-  for dirpath, subdirs, files in os.walk( folder ):
-    for x in files:
-       filename = os.path.join(dirpath, x) 
-       x = x.replace(".pkl", "")
-       try :
-         globs[x] = load(  filename )
-         print(filename) 
-       except Exception as e :
-         print(filename, e)
-
-
-def save(dd, to_file="", verbose=False):
-  import pickle, os
-  os.makedirs(os.path.dirname(to_file), exist_ok=True)
-  pickle.dump(dd, open(to_file, mode="wb") , protocol=pickle.HIGHEST_PROTOCOL)
-  #if verbose : os_file_check(to_file)
-
-
-def load(to_file=""):
-  import pickle  
-  dd =   pickle.load(open(to_file, mode="rb"))
-  return dd
 
 
 
