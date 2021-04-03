@@ -9,8 +9,14 @@ from pathlib import Path
 verbosity = 3
 
 def log(*s):
-    print(*s, flush=True)
+    if verbosity>= 1: print(*s, flush=True)
 
+
+def log2(*s):
+    if verbosity>= 1: print(*s, flush=True)
+
+def log3(*s):
+    if verbosity>= 1: print(*s, flush=True)
 
 ####################################################################################################
 
@@ -41,7 +47,6 @@ def test_dataset_classifier_covtype(nrows=500):
     coly        = ["Covertype"]
 
     log("start")
-    global model, session
 
     root     = os.path.join(os.getcwd() ,"ztmp")
     BASE_DIR = Path.home().joinpath( root, 'data/input/covtype/')
@@ -56,10 +61,9 @@ def test_dataset_classifier_covtype(nrows=500):
     # Read nrows of only the given columns
     feature_columns = colnum + colcat + coly
     df = pd.read_csv(datafile, header=None, names=feature_columns, nrows=nrows)
-    #### Matching Big dict  ##################################################
-    # X = df
-    # y = df[coly].astype('uint8')
-    return df, colnum, colcat, coly
+    pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly }
+
+    return df, pars
 
 
 
