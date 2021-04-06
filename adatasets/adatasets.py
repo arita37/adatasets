@@ -1,8 +1,7 @@
 # pylint: disable=C0321,C0103,C0301,E1305,E1121,C0302,C0330,C0111,W0613,W0611,R1705
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime,inspect, json, yaml
-import logging, os, pandas as pd, numpy as np
-from sklearn.model_selection import train_test_split
+import os, sys, time, datetime,inspect, json, yaml, pandas as pd, numpy as np
+from sklearn.model_selection import train_test_split,
 from pathlib import Path
 
 ####################################################################################################
@@ -11,25 +10,47 @@ verbosity = 3
 def log(*s):
     if verbosity>= 1: print(*s, flush=True)
 
-
 def log2(*s):
     if verbosity>= 1: print(*s, flush=True)
 
 def log3(*s):
     if verbosity>= 1: print(*s, flush=True)
 
+
 ####################################################################################################
 
 
-def benchmark(config='', dmin=5, dmax=6):
+def dataset_classifier_XXXXX(nrows=500, **kw):
+
+    ....
+
+    pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly, 'info': '' }
+    return df, pars  
+
+
+
+
+
+
+
+
+
+
+####################################################################################################
+def split(df):
+    X,y = df
+    X_train_full, X_test, y_train_full, y_test = train_test_split(X, y, test_size=0.05, random_state=2021)
+    X_train, X_valid, y_train, y_valid         = train_test_split(X_train_full, y_train_full, random_state=2021)
+
+
+
+def dataset_classifier_pmlb(name='', return_X_y=False):
     from pmlb import fetch_data, classification_dataset_names
 
-    for classification_dataset in classification_dataset_names[dmin:dmax]:
-        X, y = fetch_data(classification_dataset, return_X_y=True)
+    ds = classification_dataset_names[name]:
 
-        X_train_full, X_test, y_train_full, y_test = train_test_split(X, y, test_size=0.05, random_state=2021)
-        X_train, X_valid, y_train, y_valid         = train_test_split(X_train_full, y_train_full, random_state=2021)
-
+    df = fetch_data(ds, return_X_y= return_X_y)
+    return df, pars
 
 
 
