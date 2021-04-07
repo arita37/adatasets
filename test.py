@@ -9,7 +9,7 @@ def log(*s):
 
 ##################################################################################################
 def test1():
-   from adatasets.adatasets import (test_dataset_classification_fake, test_dataset_regression_fake,
+   from adatasets import (test_dataset_classification_fake, test_dataset_regression_fake,
     test_dataset_classifier_covtype, test_dataset_classification_petfinder
 
    )
