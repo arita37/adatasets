@@ -5,7 +5,12 @@ import os, sys, time, datetime,inspect
 
 ##################################################################################################
 def test1():
-   pass
+   from adatasets.adatasets import (test_dataset_classification_fake, test_dataset_regression_fake)
+
+   df, pars = test_dataset_classification_fake(nrows=1000)
+   df, pars = test_dataset_regression_fake(1000)
+
+
 
 if __name__ == "__main__":
     import fire

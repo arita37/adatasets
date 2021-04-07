@@ -1,8 +1,13 @@
 # pylint: disable=C0321,C0103,C0301,E1305,E1121,C0302,C0330,C0111,W0613,W0611,R1705
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime,inspect, json, yaml, pandas as pd, numpy as np
-from sklearn.model_selection import train_test_split,
+import os, sys, time, datetime,inspect, json, pandas as pd, numpy as np
+from sklearn.model_selection import train_test_split
 from pathlib import Path
+
+
+from utilmy.utilmy import (os_makedirs, os_system, global_verbosity, git_current_hash, git_repo_root
+                           )
+
 
 ####################################################################################################
 verbosity = 3
@@ -18,18 +23,24 @@ def log3(*s):
 
 
 ####################################################################################################
-
-
 def dataset_classifier_XXXXX(nrows=500, **kw):
+    """
 
-    ....
-
+    """
+    colnum = []
+    colcat = []
+    coly = []
+    df = pd.DataFrame
     pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly, 'info': '' }
     return df, pars  
 
 
-
-
+####################################################################################################
+def split(df, coly=None):
+    X,y = df.drop(coly), df[[coly]]
+    X_train_full, X_test, y_train_full, y_test = train_test_split(X, y, test_size=0.05, random_state=2021)
+    X_train, X_valid, y_train, y_valid         = train_test_split(X_train_full, y_train_full, random_state=2021)
+    return X_train, X_valid, y_train, y_valid, X_test, y_test
 
 
 
@@ -37,21 +48,14 @@ def dataset_classifier_XXXXX(nrows=500, **kw):
 
 
 ####################################################################################################
-def split(df):
-    X,y = df
-    X_train_full, X_test, y_train_full, y_test = train_test_split(X, y, test_size=0.05, random_state=2021)
-    X_train, X_valid, y_train, y_valid         = train_test_split(X_train_full, y_train_full, random_state=2021)
-
-
-
+####################################################################################################
 def dataset_classifier_pmlb(name='', return_X_y=False):
     from pmlb import fetch_data, classification_dataset_names
-
-    ds = classification_dataset_names[name]:
+    ds = classification_dataset_names[name]
+    pars = {}
 
     df = fetch_data(ds, return_X_y= return_X_y)
     return df, pars
-
 
 
 def test_dataset_classifier_covtype(nrows=500):
@@ -88,24 +92,23 @@ def test_dataset_classifier_covtype(nrows=500):
 
 
 
-def test_dataset_regress_fake(nrows=500):
+def test_dataset_regression_fake(nrows=500, n_features=17):
     from sklearn import datasets as sklearn_datasets
     coly   = 'y'
     colnum = ["colnum_" +str(i) for i in range(0, 17) ]
     colcat = ['colcat_1']
-    X, y    = sklearn_datasets.make_regression( n_samples=1000, n_features=17, n_targets=1, n_informative=17)
+    X, y    = sklearn_datasets.make_regression( n_samples=nrows, n_features=n_features, n_targets=1, n_informative=n_features-1)
     df         = pd.DataFrame(X,  columns= colnum)
     df[coly]   = y.reshape(-1, 1)
 
     for ci in colcat :
       df[colcat] = np.random.randint(0,1, len(df))
 
-    return df, colnum, colcat, coly
+    pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly }
+    return df, pars
 
 
-
-
-def test_dataset_classi_fake(nrows=500):
+def test_dataset_classification_fake(nrows=500):
     from sklearn import datasets as sklearn_datasets
     ndim    =11
     coly    = 'y'
@@ -119,10 +122,12 @@ def test_dataset_classi_fake(nrows=500):
     for ci in colcat :
       df[colcat] = np.random.randint(0,1, len(df))
 
-    return df, colnum, colcat, coly
+
+    pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly }
+    return df, pars
 
 
-def test_dataset_petfinder(nrows=1000):
+def test_dataset_classification_petfinder(nrows=1000):
     import tensorflow as tf
     # Dense features
     colnum = ['PhotoAmt', 'Fee','Age' ]
@@ -145,34 +150,12 @@ def test_dataset_petfinder(nrows=1000):
     df['y'] = np.where(df['AdoptionSpeed']==4, 0, 1)
     df      = df.drop(columns=['AdoptionSpeed', 'Description'])
 
-    print(df.dtypes)
+    log2(df.dtypes)
     return df, colnum, colcat, coly, colembed
 
 
 
-
 ###################################################################################################
-def git_repo_root():
-    try :
-      cmd = "git rev-parse --show-toplevel"
-      mout, merr = os_system(cmd)
-      path = mout.split("\n")[0]
-      if len(path) < 1:  return None
-    except : return None    
-    return path
-
-    
-def git_current_hash(mode='full'):
-   import subprocess 
-   # label = subprocess.check_output(["git", "describe", "--always"]).strip();   
-   label = subprocess.check_output([ 'git', 'rev-parse', 'HEAD' ]).strip();      
-   label = label.decode('utf-8')
-   return label
-
-
-
-
-
 
 
 
@@ -242,71 +225,7 @@ def fetch_dataset(url_dataset, path_target=None, file_target=None):
 
 
 
-
-
 ################################################################################################
-def os_get_function_name():
-    return sys._getframe(1).f_code.co_name
-
-
-def os_getcwd():
-    root = os.path.abspath(os.getcwd()).replace("\\", "/") + "/"
-    return  root
-
-
-def os_system(cmd, doprint=False):
-  """ get values
-       os_system( f"   ztmp ",  doprint=True)
-  """
-  import subprocess  
-  try :
-    p          = subprocess.run( cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, )
-    mout, merr = p.stdout.decode('utf-8'), p.stderr.decode('utf-8')    
-    if doprint: 
-      l = mout  if len(merr) < 1 else mout + "\n\nbash_error:\n" + merr
-      print(l)
-
-    return mout, merr
-  except Exception as e :
-    print( f"Error {cmd}, {e}")
-
-      
-def os_makedirs(dir_or_file):
-    if os.path.isfile(dir_or_file) :
-        os.makedirs(os.path.dirname(os.path.abspath(dir_or_file)), exist_ok=True)
-    else :
-        os.makedirs(os.path.abspath(dir_or_file), exist_ok=True)
-
-
-
-
-
-
-
-
-
-################################################################################################
-class dict_to_namespace(object):
-    def __init__(self, d):
-        self.__dict__ = d
-
-
-
-
-
-
-
-
-
-
-
-##################################################################################################
-def test():
-   from utilmy import (os_makedirs, Session, global_verbosity, os_system  
-                       
-                      )
-
-  
 if __name__ == "__main__":
     import fire
     fire.Fire()
