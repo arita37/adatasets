@@ -4,10 +4,8 @@ import os, sys, time, datetime,inspect, json, pandas as pd, numpy as np
 from sklearn.model_selection import train_test_split
 from pathlib import Path
 
-
 from utilmy.utilmy import (os_makedirs, os_system, global_verbosity, git_current_hash, git_repo_root
                            )
-
 
 ####################################################################################################
 verbosity = 3
@@ -16,9 +14,6 @@ def log(*s):
     if verbosity>= 1: print(*s, flush=True)
 
 def log2(*s):
-    if verbosity>= 1: print(*s, flush=True)
-
-def log3(*s):
     if verbosity>= 1: print(*s, flush=True)
 
 
@@ -54,8 +49,9 @@ def dataset_classifier_pmlb(name='', return_X_y=False):
     ds = classification_dataset_names[name]
     pars = {}
 
-    df = fetch_data(ds, return_X_y= return_X_y)
-    return df, pars
+    X,y = fetch_data(ds, return_X_y=  True)
+    X['coly'] = y
+    return X, pars
 
 
 def test_dataset_classifier_covtype(nrows=500):
@@ -97,12 +93,13 @@ def test_dataset_regression_fake(nrows=500, n_features=17):
     coly   = 'y'
     colnum = ["colnum_" +str(i) for i in range(0, 17) ]
     colcat = ['colcat_1']
-    X, y    = sklearn_datasets.make_regression( n_samples=nrows, n_features=n_features, n_targets=1, n_informative=n_features-1)
+    X, y    = sklearn_datasets.make_regression( n_samples=nrows, n_features=n_features, n_targets=1,
+                                                n_informative=n_features-1)
     df         = pd.DataFrame(X,  columns= colnum)
     df[coly]   = y.reshape(-1, 1)
 
     for ci in colcat :
-      df[colcat] = np.random.randint(0,1, len(df))
+      df[ci] = np.random.randint(0,1, len(df))
 
     pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly }
     return df, pars
@@ -114,14 +111,13 @@ def test_dataset_classification_fake(nrows=500):
     coly    = 'y'
     colnum  = ["colnum_" +str(i) for i in range(0, ndim) ]
     colcat  = ['colcat_1']
-    X, y    = sklearn_datasets.make_classification(n_samples=1000, n_features=ndim, n_targets=1, n_informative=ndim
-    )
+    X, y    = sklearn_datasets.make_classification(n_samples=1000, n_features=ndim, n_classes=1,
+                                                   n_informative=ndim-2)
     df         = pd.DataFrame(X,  columns= colnum)
     df[coly]   = y.reshape(-1, 1)
 
     for ci in colcat :
-      df[colcat] = np.random.randint(0,1, len(df))
-
+      df[ci] = np.random.randint(0,1, len(df))
 
     pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly }
     return df, pars
@@ -151,14 +147,13 @@ def test_dataset_classification_petfinder(nrows=1000):
     df      = df.drop(columns=['AdoptionSpeed', 'Description'])
 
     log2(df.dtypes)
-    return df, colnum, colcat, coly, colembed
+    pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly, 'colembed' : colembed }
+    return df, pars
+
 
 
 
 ###################################################################################################
-
-
-
 def fetch_dataset(url_dataset, path_target=None, file_target=None):
     """Fetch dataset from a given URL and save it.
 

@@ -23,7 +23,7 @@ print("version", version)
 ##### Requirements ###################################################################
 #with open('install/requirements.txt') as fp:
 #    install_requires = fp.read()
-install_requires = ['pyyaml', 'pmlb', 'utilmy']
+install_requires = ['pyyaml', 'pmlb', 'utilmy', 'wget', 'sklearn']
 
 
 
