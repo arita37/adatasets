@@ -9,14 +9,15 @@ def log(*s):
 
 ##################################################################################################
 def test1():
-   from adatasets.adatasets import (test_dataset_classification_fake, test_dataset_regression_fake
-
-
+   from adatasets.adatasets import (test_dataset_classification_fake, test_dataset_regression_fake,
+    test_dataset_classifier_covtype, test_dataset_classification_petfinder
 
    )
 
    df, pars = test_dataset_classification_fake(nrows=1000) ; log(df, pars)
    df, pars = test_dataset_regression_fake(1000)  ; log(df, pars)
+
+   df, pars = test_dataset_classifier_covtype(1000) ; log(df, pars)
 
 
 
