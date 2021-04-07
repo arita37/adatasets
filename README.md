@@ -10,7 +10,6 @@
       coly   = pars['coly']
       colnum = pars['colnum']
       colcat = pars['colcat']      
-      metrics = pars['metrics']
       ``` 
 
 
