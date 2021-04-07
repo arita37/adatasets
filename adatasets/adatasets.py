@@ -30,14 +30,14 @@ def dataset_classifier_XXXXX(nrows=500, **kw):
     return df, pars  
 
 
+
+
 ####################################################################################################
 def split(df, coly=None):
     X,y = df.drop(coly), df[[coly]]
     X_train_full, X_test, y_train_full, y_test = train_test_split(X, y, test_size=0.05, random_state=2021)
     X_train, X_valid, y_train, y_valid         = train_test_split(X_train_full, y_train_full, random_state=2021)
     return X_train, X_valid, y_train, y_valid, X_test, y_test
-
-
 
 
 
