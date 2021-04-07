@@ -2,13 +2,21 @@
 # -*- coding: utf-8 -*-
 import os, sys, time, datetime,inspect
 
+def log(*s):
+    print(*s, flush=True)
+
+
 
 ##################################################################################################
 def test1():
-   from adatasets.adatasets import (test_dataset_classification_fake, test_dataset_regression_fake)
+   from adatasets.adatasets import (test_dataset_classification_fake, test_dataset_regression_fake
 
-   df, pars = test_dataset_classification_fake(nrows=1000)
-   df, pars = test_dataset_regression_fake(1000)
+
+
+   )
+
+   df, pars = test_dataset_classification_fake(nrows=1000) ; log(df, pars)
+   df, pars = test_dataset_regression_fake(1000)  ; log(df, pars)
 
 
 
