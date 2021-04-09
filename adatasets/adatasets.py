@@ -33,12 +33,22 @@ def dataset_classifier_XXXXX(nrows=500, **kw):
 
 
 ####################################################################################################
-def split(df, coly=None):
+def pd_train_test_split(df, coly=None):
     X,y = df.drop(coly), df[[coly]]
     X_train_full, X_test, y_train_full, y_test = train_test_split(X, y, test_size=0.05, random_state=2021)
     X_train, X_valid, y_train, y_valid         = train_test_split(X_train_full, y_train_full, random_state=2021)
     return X_train, X_valid, y_train, y_valid, X_test, y_test
 
+
+
+def pd_train_test_split2(df, coly):
+    log2(df.dtypes)
+    X,y = df.drop(coly,  axis=1), df[coly]
+    log2('y', np.sum(y[y==1]) , X.head(3))
+    X_train_full, X_test, y_train_full, y_test = train_test_split(X, y, test_size=0.05, random_state=2021)
+    X_train, X_valid, y_train, y_valid         = train_test_split(X_train_full, y_train_full, random_state=2021)
+    num_classes                                = len(set(y_train_full.values.ravel()))
+    return X,y, X_train, X_valid, y_train, y_valid, X_test,  y_test, num_classes
 
 
 
@@ -70,7 +80,7 @@ def test_dataset_classifier_covtype(nrows=500):
     log("start")
 
     root     = os.path.join(os.getcwd() ,"ztmp")
-    BASE_DIR = Path.home().joinpath( root, 'data/input/covtype/')
+    BASE_DIR = Path.home().joinpath( root, '/covtype/')
     datafile = BASE_DIR.joinpath('covtype.data.gz')
     datafile.parent.mkdir(parents=True, exist_ok=True)
     url = "https://archive.ics.uci.edu/ml/machine-learning-databases/covtype/covtype.data.gz"
