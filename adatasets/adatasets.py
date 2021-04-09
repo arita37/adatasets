@@ -73,25 +73,24 @@ def test_dataset_classifier_covtype(nrows=500):
 
     # Sparse features
     colcat = ["Wilderness_Area1",  "Wilderness_Area2", "Wilderness_Area3",
-        "Wilderness_Area4",  "Soil_Type1",  "Soil_Type2",  "Soil_Type3",
-        "Soil_Type4",  "Soil_Type5",  "Soil_Type6",  "Soil_Type7",  "Soil_Type8",  "Soil_Type9",  ]
+              "Wilderness_Area4",  "Soil_Type1",  "Soil_Type2",  "Soil_Type3",
+              "Soil_Type4",  "Soil_Type5",  "Soil_Type6",  "Soil_Type7",  "Soil_Type8",  "Soil_Type9",  ]
 
     # Target column
-    coly        = ["Covertype"]
+    coly   = ["Covertype"]
 
     datafile = os.getcwd() + "/ztmp/covtype/covtype.data.gz"
-    os_makedirs(datafile)
-    url = "https://archive.ics.uci.edu/ml/machine-learning-databases/covtype/covtype.data.gz"
+    os_makedirs(os.path.dirname(datafile))
+    url      = "https://archive.ics.uci.edu/ml/machine-learning-databases/covtype/covtype.data.gz"
     if not Path(datafile).exists():
         wget.download(url, datafile)
 
     # Read nrows of only the given columns
     feature_columns = colnum + colcat + coly
-    df = pd.read_csv(datafile, header=None, names=feature_columns, nrows=nrows)
+    df   = pd.read_csv(datafile, header=None, names=feature_columns, nrows=nrows)
     pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly }
 
     return df, pars
-
 
 
 def test_dataset_regression_fake(nrows=500, n_features=17):
