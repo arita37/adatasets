@@ -65,6 +65,8 @@ def dataset_classifier_pmlb(name='', return_X_y=False):
 
 
 def test_dataset_classifier_covtype(nrows=500):
+    log("start")
+
     import wget
     # Dense features
     colnum = ["Elevation", "Aspect", "Slope", "Horizontal_Distance_To_Hydrology",]
@@ -77,17 +79,11 @@ def test_dataset_classifier_covtype(nrows=500):
     # Target column
     coly        = ["Covertype"]
 
-    log("start")
-
-    root     = os.path.join(os.getcwd() ,"ztmp")
-    BASE_DIR = Path.home().joinpath( root, '/covtype/')
-    datafile = BASE_DIR.joinpath('covtype.data.gz')
-    datafile.parent.mkdir(parents=True, exist_ok=True)
+    datafile = os.getcwd() + "/ztmp/covtype/covtype.data.gz"
+    os_makedirs(datafile)
     url = "https://archive.ics.uci.edu/ml/machine-learning-databases/covtype/covtype.data.gz"
-
-    # Download the dataset in case it's missing
-    if not datafile.exists():
-        wget.download(url, datafile.as_posix())
+    if not Path(datafile).exists():
+        wget.download(url, datafile)
 
     # Read nrows of only the given columns
     feature_columns = colnum + colcat + coly
