@@ -141,20 +141,24 @@ def test_dataset_classification_petfinder(nrows=1000):
 
     dataset_url = 'http://storage.googleapis.com/download.tensorflow.org/data/petfinder-mini.zip'
     localfile   = os.path.abspath('ztmp/petfinder-mini/')
-    filepath    = localfile + "/../petfinder-mini/petfinder-mini.csv"
+    filepath    = localfile + "/petfinder-mini/petfinder-mini.csv"
 
     if not os.path.exists(filepath):
         os.makedirs(localfile, exist_ok=True)
         wget.download(dataset_url, localfile + "/petfinder-mini.zip")
         import zipfile
         with zipfile.ZipFile(localfile + "/petfinder-mini.zip", 'r') as zip_ref:
-            zip_ref.extractall(localfile + "/../")
+            zip_ref.extractall(localfile + "/")
 
     log('Data Frame Loaded')
-    df      = pd.read_csv(filepath)
-    df      = df.iloc[:nrows, :]
+    df       = pd.read_csv(filepath)
+    df       = df.iloc[:nrows, :]
     df[coly] = np.where(df['AdoptionSpeed']==4, 0, 1)
     df       = df.drop(columns=['AdoptionSpeed', 'Description'])
+
+    import shutil
+    shutil.rmtree(localfile, ignore_errors=True)
+
 
     log2(df.dtypes)
     pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly, 'colembed' : colembed }

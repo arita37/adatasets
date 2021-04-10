@@ -25,14 +25,6 @@ def test1():
      log(t, "\n", df, pars)
 
 
-   """    
-   df, pars = test_dataset_classification_fake(nrows=1000) ; log(df, pars)
-   df, pars = test_dataset_regression_fake(1000)  ; log(df, pars)
-
-   df, pars = test_dataset_classifier_covtype(1000) ; log(df, pars)
-
-   df, pars = test_dataset_classification_petfinder(1000) ; log(df, pars)
-   """
 
 if __name__ == "__main__":
     import fire
