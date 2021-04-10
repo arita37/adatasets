@@ -1,11 +1,13 @@
 ## adatasets
 
+      https://pypi.org/project/adatasets/#history
+
+
       Dataset for ML testing
-      
-      
+            
       ```
-      from adatasets import data_classifier_covtype  
-      df, pars = data_classifier_covtype(nrows=500)
+      from adatasets import test_dataset_classification_fake 
+      df, pars = test_dataset_classification_fake(nrows=500)
     
       coly   = pars['coly']
       colnum = pars['colnum']
