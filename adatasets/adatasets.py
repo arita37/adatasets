@@ -1,6 +1,6 @@
 # pylint: disable=C0321,C0103,C0301,E1305,E1121,C0302,C0330,C0111,W0613,W0611,R1705
 # -*- coding: utf-8 -*-
-import os, sys, time, datetime,inspect, json, pandas as pd, numpy as np
+import os, sys, time, datetime,inspect, json, pandas as pd, numpy as np, wget
 from sklearn.model_selection import train_test_split
 from pathlib import Path
 
@@ -129,7 +129,6 @@ def test_dataset_classification_fake(nrows=500):
 
 
 def test_dataset_classification_petfinder(nrows=1000):
-    import tensorflow as tf
     # Dense features
     colnum = ['PhotoAmt', 'Fee','Age' ]
 
@@ -138,18 +137,24 @@ def test_dataset_classification_petfinder(nrows=1000):
               'Health', 'Breed1' ]
 
     colembed = ['Breed1']
-    # Target column
     coly        = "y"
 
     dataset_url = 'http://storage.googleapis.com/download.tensorflow.org/data/petfinder-mini.zip'
-    csv_file    = 'datasets/petfinder-mini/petfinder-mini.csv'
-    tf.keras.utils.get_file('petfinder_mini.zip', dataset_url,extract=True, cache_dir='.')
+    localfile   = 'ztmp/petfinder-mini/petfinder-mini.zip'
+    filepath = localfile + "/../petfinder-mini/petfinder-mini.csv"
 
-    print('Data Frame Loaded')
-    df      = pd.read_csv(csv_file)
+    if not os.path.exists(filepath):
+        os.makedirs(os.path.dirname(localfile), exist_ok=True)
+        wget.download(dataset_url, localfile)
+        import zipfile
+        with zipfile.ZipFile(localfile, 'r') as zip_ref:
+            zip_ref.extractall(localfile + "/../")
+
+    log('Data Frame Loaded')
+    df      = pd.read_csv(filepath)
     df      = df.iloc[:nrows, :]
-    df['y'] = np.where(df['AdoptionSpeed']==4, 0, 1)
-    df      = df.drop(columns=['AdoptionSpeed', 'Description'])
+    df[coly] = np.where(df['AdoptionSpeed']==4, 0, 1)
+    df       = df.drop(columns=['AdoptionSpeed', 'Description'])
 
     log2(df.dtypes)
     pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly, 'colembed' : colembed }
