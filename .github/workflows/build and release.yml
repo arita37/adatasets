@@ -1,0 +1,110 @@
+name: Build and Test , Package PyPI
+
+###  https://github.com/arita37/awesome-actions#static-analysis
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+
+
+#######################################################################################################
+#######################################################################################################
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+   
+    - name: Set up Python 3.6.*
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.6.*
+      
+    - name: Install pipenv
+      uses: dschep/install-pipenv-action@v1
+      
+  
+    - name: Cache pipenv virtualenv
+      id: cache-pipenv
+      uses: actions/cache@v1
+      with:
+        path: /opt/hostedtoolcache/Python/
+        key: ${{ runner.os }}-pipenv-${{ hashFiles('**/install/py36.txt') }}
+          
+
+    - name: Install numpy
+      if: steps.cache-pipenv.outputs.cache-hit != 'true'
+      run: pip install numpy==1.18.2   pillow==6.2.1  scipy
+      
+
+    - name: Install repo requirements  1
+      if: steps.cache-pipenv.outputs.cache-hit != 'true'
+      run: |
+           pip install -r  py36.txt
+           
+    - name: Install repo requirements   2
+      if: steps.cache-pipenv.outputs.cache-hit != 'true'
+      run:  |
+        ls .
+        #pip install -r install/requirements_fake.txt
+    #- name: Install repo
+    #  run: pip install -e . -r install/py36.txt  --no-deps
+
+
+    - name: test_import
+      run: |
+           python -c "import os, pandas as pd; print(os)"
+        
+        
+    ########  Runs All test
+    - name: run_all
+      run: |
+          mkdir -p    /home/runner/work/log_tmp/
+          pip install -e .
+          chmod -R 777 . &&  python  test.py
+          # chmod -R 777 . && cd utilmy && python  test.py  test1
+
+
+    ########  Runs All test       
+    - name: log_gitcommit
+      run: |
+           ls .
+
+
+#######################################################################################################
+#######################################################################################################
+# This Job will upload a Python Package using Twine when a release is created
+  deploy:
+    needs : [build] # List of dependent Jobs 
+    if: success()   # check if all previous (needs) dependent jobs were successfull  then only execute
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine
+
+    - name: Build and publish
+      #env:
+      #  TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+      #  TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        # echo "$TWINE_USERNAME"
+        python run_pipy.py
+        python setup.py sdist bdist_wheel
+        twine upload dist/*  --username ${{ secrets.PYPI_USERNAME }}     --password ${{ secrets.PYPI_PASSWORD }}  --skip-existing   --repository-url https://upload.pypi.org/legacy/  --verbose   

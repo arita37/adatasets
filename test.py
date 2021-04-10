@@ -19,6 +19,7 @@ def test1():
 
    df, pars = test_dataset_classifier_covtype(1000) ; log(df, pars)
 
+   df, pars = test_dataset_classification_petfinder(1000) ; log(df, pars)
 
 
 if __name__ == "__main__":
