@@ -140,14 +140,14 @@ def test_dataset_classification_petfinder(nrows=1000):
     coly        = "y"
 
     dataset_url = 'http://storage.googleapis.com/download.tensorflow.org/data/petfinder-mini.zip'
-    localfile   = 'ztmp/petfinder-mini/petfinder-mini.zip'
-    filepath = localfile + "/../petfinder-mini/petfinder-mini.csv"
+    localfile   = os.path.abspath('ztmp/petfinder-mini/')
+    filepath    = localfile + "/../petfinder-mini/petfinder-mini.csv"
 
     if not os.path.exists(filepath):
-        os.makedirs(os.path.dirname(localfile), exist_ok=True)
-        wget.download(dataset_url, localfile)
+        os.makedirs(localfile, exist_ok=True)
+        wget.download(dataset_url, localfile + "/petfinder-mini.zip")
         import zipfile
-        with zipfile.ZipFile(localfile, 'r') as zip_ref:
+        with zipfile.ZipFile(localfile + "/petfinder-mini.zip", 'r') as zip_ref:
             zip_ref.extractall(localfile + "/../")
 
     log('Data Frame Loaded')
