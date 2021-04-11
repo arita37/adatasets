@@ -4,8 +4,8 @@ import os, sys, time, datetime,inspect, json, pandas as pd, numpy as np, wget
 from sklearn.model_selection import train_test_split
 from pathlib import Path
 
-from utilmy.utilmy import (os_makedirs, os_system, global_verbosity, git_current_hash, git_repo_root
-                           )
+# from utilmy.utilmy import (os_makedirs, os_system, global_verbosity, git_current_hash, git_repo_root
+#                            )
 
 ####################################################################################################
 verbosity = 3
@@ -64,35 +64,6 @@ def dataset_classifier_pmlb(name='', return_X_y=False):
     return X, pars
 
 
-def test_dataset_classifier_covtype(nrows=500):
-    log("start")
-
-    import wget
-    # Dense features
-    colnum = ["Elevation", "Aspect", "Slope", "Horizontal_Distance_To_Hydrology",]
-
-    # Sparse features
-    colcat = ["Wilderness_Area1",  "Wilderness_Area2", "Wilderness_Area3",
-              "Wilderness_Area4",  "Soil_Type1",  "Soil_Type2",  "Soil_Type3",
-              "Soil_Type4",  "Soil_Type5",  "Soil_Type6",  "Soil_Type7",  "Soil_Type8",  "Soil_Type9",  ]
-
-    # Target column
-    coly   = ["Covertype"]
-
-    datafile = os.getcwd() + "/ztmp/covtype/covtype.data.gz"
-    os_makedirs(os.path.dirname(datafile))
-    url      = "https://archive.ics.uci.edu/ml/machine-learning-databases/covtype/covtype.data.gz"
-    if not Path(datafile).exists():
-        wget.download(url, datafile)
-
-    # Read nrows of only the given columns
-    feature_columns = colnum + colcat + coly
-    df   = pd.read_csv(datafile, header=None, names=feature_columns, nrows=nrows)
-    pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly }
-
-    return df, pars
-
-
 def test_dataset_regression_fake(nrows=500, n_features=17):
     from sklearn import datasets as sklearn_datasets
     coly   = 'y'
@@ -127,6 +98,33 @@ def test_dataset_classification_fake(nrows=500):
     pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly }
     return df, pars
 
+def test_dataset_classifier_covtype(nrows=500):
+    log("start")
+
+    import wget
+    # Dense features
+    colnum = ["Elevation", "Aspect", "Slope", "Horizontal_Distance_To_Hydrology",]
+
+    # Sparse features
+    colcat = ["Wilderness_Area1",  "Wilderness_Area2", "Wilderness_Area3",
+              "Wilderness_Area4",  "Soil_Type1",  "Soil_Type2",  "Soil_Type3",
+              "Soil_Type4",  "Soil_Type5",  "Soil_Type6",  "Soil_Type7",  "Soil_Type8",  "Soil_Type9",  ]
+
+    # Target column
+    coly   = ["Covertype"]
+
+    datafile = os.getcwd() + "/ztmp/covtype/covtype.data.gz"
+    os.makedirs(os.path.dirname(datafile), exist_ok=True)
+    url      = "https://archive.ics.uci.edu/ml/machine-learning-databases/covtype/covtype.data.gz"
+    if not Path(datafile).exists():
+        wget.download(url, datafile)
+
+    # Read nrows of only the given columns
+    feature_columns = colnum + colcat + coly
+    df   = pd.read_csv(datafile, header=None, names=feature_columns, nrows=nrows)
+    pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly }
+
+    return df, pars
 
 def test_dataset_classification_petfinder(nrows=1000):
     # Dense features
