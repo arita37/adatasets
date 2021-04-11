@@ -116,7 +116,7 @@ def test_dataset_classification_fake(nrows=500):
     coly    = 'y'
     colnum  = ["colnum_" +str(i) for i in range(0, ndim) ]
     colcat  = ['colcat_1']
-    X, y    = sklearn_datasets.make_classification(n_samples=1000, n_features=ndim, n_classes=1,
+    X, y    = sklearn_datasets.make_classification(n_samples=nrows, n_features=ndim, n_classes=1,
                                                    n_informative=ndim-2)
     df         = pd.DataFrame(X,  columns= colnum)
     df[coly]   = y.reshape(-1, 1)
