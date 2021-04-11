@@ -1,8 +1,12 @@
-## adatasets
 
-      https://pypi.org/project/adatasets/#history
+[![Build and Test , Package PyPI](https://github.com/arita37/adatasets/actions/workflows/build%20and%20release.yml/badge.svg)](https://github.com/arita37/adatasets/actions/workflows/build%20and%20release.yml)
 
 
+[Pypi       https://pypi.org/project/adatasets/#history](https://pypi.org/project/adatasets/#history)
+
+
+
+### adatasets
       Dataset for ML testing
             
       ```
@@ -17,8 +21,7 @@
 
 
 
-## Install
-
+### Install
     pip install adatasets
     
     
