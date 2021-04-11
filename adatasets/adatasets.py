@@ -11,10 +11,12 @@ from pathlib import Path
 verbosity = 3
 
 def log(*s):
-    if verbosity>= 1: print(*s, flush=True)
+    if verbosity>= 1: 
+        print(*s, flush=True)
 
 def log2(*s):
-    if verbosity>= 1: print(*s, flush=True)
+    if verbosity>= 1: 
+        print(*s, flush=True)
 
 
 ####################################################################################################
@@ -67,7 +69,7 @@ def dataset_classifier_pmlb(name='', return_X_y=False):
 def test_dataset_regression_fake(nrows=500, n_features=17):
     from sklearn import datasets as sklearn_datasets
     coly   = 'y'
-    colnum = ["colnum_" +str(i) for i in range(0, 17) ]
+    colnum = ["colnum_" +str(i) for i in range(0, n_features) ]
     colcat = ['colcat_1']
     X, y    = sklearn_datasets.make_regression( n_samples=nrows, n_features=n_features, n_targets=1,
                                                 n_informative=n_features-1)
@@ -81,9 +83,8 @@ def test_dataset_regression_fake(nrows=500, n_features=17):
     return df, pars
 
 
-def test_dataset_classification_fake(nrows=500):
+def test_dataset_classification_fake(nrows=500, ndim=11):
     from sklearn import datasets as sklearn_datasets
-    ndim    =11
     coly    = 'y'
     colnum  = ["colnum_" +str(i) for i in range(0, ndim) ]
     colcat  = ['colcat_1']
@@ -158,7 +159,7 @@ def test_dataset_classification_petfinder(nrows=1000):
     shutil.rmtree(localfile, ignore_errors=True)
 
 
-    log2(df.dtypes)
+    log(df.dtypes)
     pars = { 'colnum': colnum, 'colcat': colcat, "coly": coly, 'colembed' : colembed }
     return df, pars
 
