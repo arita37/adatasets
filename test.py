@@ -24,26 +24,9 @@ def test1():
      df, pars = myfun(100)
      log(t, "\n", df, pars)
      
+     assert len(df.index) == 100, 'mismatch test_dataset_classification_fake row data '+str(len(df.index)) +" vs "+str(nrow)
+     assert len(df[pars["colnum"]]) > 0, "error"
    
-     nrow = random.randint(0,20)*100
-     df, pars = test_dataset_classification_fake(nrow)
-     assert len(df.index) == nrow, 'mismatch test_dataset_classification_fake row data '+str(len(df.index)) +" vs "+str(nrow)
-
-   
-     nrow = random.randint(0,20)*100
-     df, pars =  test_dataset_regression_fake(nrow)
-     assert len(df.index) == nrow, 'mismatch test_dataset_regression_fake row data'+str(len(df.index)) +"vs"+str(nrow)
-
-   
-     nrow = random.randint(0,20)*100
-     df, pars = test_dataset_classifier_covtype(nrow)
-     assert len(df.index) == nrow, 'mismatch test_dataset_classifier_covtype row data'+str(len(df.index)) +"vs"+str(nrow)
-
-    
-     nrow = random.randint(0,20)*100
-     df, pars = test_dataset_classification_petfinder(nrow)
-     assert len(df.index) == nrow, 'mismatch test_dataset_classification_petfinder row data'+str(len(df.index)) +"vs"+str(nrow)
-
 
 
 if __name__ == "__main__":
