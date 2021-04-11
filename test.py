@@ -17,16 +17,30 @@ def test1():
    ll = [ 'test_dataset_classification_fake', 'test_dataset_regression_fake',
           'test_dataset_classifier_covtype', 'test_dataset_classification_petfinder'
    ]
-
+   nrows= 100
    for t in ll :
      log("\n\n##########################", t)
      myfun    = locals()[t]
-     df, pars = myfun(100)
+     df, pars = myfun(nrows)
      log(t, "\n", df, pars)
      
-     assert len(df.index) == 100, 'mismatch test_dataset_classification_fake row data '+str(len(df.index)) +" vs "+str(nrow)
-     assert len(df[pars["colnum"]]) > 0, "error"
-   
+     assert len(df.index) == 100, f'mismatch {t} row data {len(df)}  vs {nrows}'
+
+
+     log("\n######### Column names check ")
+     cols_family = {}
+     for key,val in pars.items():
+         if key.startswith('col') :
+             cols_family[key] =  val
+
+     for colname, colist in cols_family.items():
+        print(colname, colist)
+        assert len(df[ colist ]) > 0 , f"missing {colname}"
+
+
+
+
+
 
 
 if __name__ == "__main__":
